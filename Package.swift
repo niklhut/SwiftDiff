@@ -8,6 +8,7 @@ let package = Package(
         .library(name: "SwiftDiff", targets: ["SwiftDiff"])
     ],
     targets: [
-        .target(name: "SwiftDiff")
+        .target(name: "SwiftDiff"),
+        .testTarget(name: "SwiftDiffTests", dependencies: ["SwiftDiff"]),
     ]
 )
