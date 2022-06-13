@@ -8,7 +8,7 @@ func cleanupMerge(diffs: [Diff]) -> [Diff] {
     repeat {
 
         // Add a dummy entry at the end.
-        diffs.append(.equal(""))
+        diffs.append(.equal(text: ""))
         var pointer = 0
         var countDelete = 0
         var countInsert = 0
@@ -34,9 +34,9 @@ func cleanupMerge(diffs: [Diff]) -> [Diff] {
                             let index = pointer - countDelete - countInsert
                             let prefix = textInsert.substring(to: prefixLength)
                             if index > 0, case .equal(let text) = diffs[index - 1] {
-                                diffs[index - 1] = .equal(text + prefix)
+                                diffs[index - 1] = .equal(text: text + prefix)
                             } else {
-                                diffs.insert(.equal(prefix), at: 0)
+                                diffs.insert(.equal(text: prefix), at: 0)
                                 pointer += 1
                             }
                             textInsert = textInsert.substring(from: prefixLength)
@@ -62,17 +62,17 @@ func cleanupMerge(diffs: [Diff]) -> [Diff] {
                     if countDelete == 0 {
                         let index = pointer - countInsert
                         diffs.removeSubrange(index..<(index + countInsert))
-                        diffs.insert(.insert(textInsert),
+                        diffs.insert(.insert(text: textInsert),
                                      at: index)
                     } else if countInsert == 0 {
                         let index = pointer - countDelete
                         diffs.removeSubrange(index..<(index + countDelete))
-                        diffs.insert(.delete(textDelete),
+                        diffs.insert(.delete(text: textDelete),
                                      at: index)
                     } else {
                         let index = pointer - countDelete - countInsert
                         diffs.removeSubrange(index..<(index + countDelete + countInsert))
-                        diffs.insert(contentsOf: [.delete(textDelete), .insert(textInsert)],
+                        diffs.insert(contentsOf: [.delete(text: textDelete), .insert(text: textInsert)],
                                      at: index)
                     }
 
@@ -80,7 +80,7 @@ func cleanupMerge(diffs: [Diff]) -> [Diff] {
                         + (countDelete > 0 ? 1 : 0) + (countInsert > 0 ? 1 : 0) + 1
                 } else if pointer != 0, case .equal(let text) = diffs[pointer - 1] {
                     // Merge this equality with the previous one.
-                    diffs[pointer - 1] = .equal(text + diffs[pointer].text)
+                    diffs[pointer - 1] = .equal(text: text + diffs[pointer].text)
                     diffs.remove(at: pointer)
                 } else {
                     pointer += 1
@@ -333,11 +333,11 @@ public func cleanupSemantic(diffs: [Diff]) -> [Diff] {
                 {
                     // Duplicate record.
                     let lastEqualityIndex = equalities[equalitiesLength - 1]
-                    diffs.insert(.delete(equality),
+                    diffs.insert(.delete(text: equality),
                                  at: lastEqualityIndex)
 
                     // Change second copy to insert.
-                    diffs[lastEqualityIndex + 1] = .insert(diffs[lastEqualityIndex + 1].text)
+                    diffs[lastEqualityIndex + 1] = .insert(text: diffs[lastEqualityIndex + 1].text)
 
                     // Throw away the equality we just deleted.
                     // Throw away the previous equality (it needs to be reevaluated).
@@ -387,11 +387,11 @@ public func cleanupSemantic(diffs: [Diff]) -> [Diff] {
                     || Float(overlapLength1) >= Float(insertionLength) / 2.0
                 {
                     // Overlap found.  Insert an equality and trim the surrounding edits.
-                    diffs.insert(.equal(insertion.substring(to: overlapLength1)),
+                    diffs.insert(.equal(text: insertion.substring(to: overlapLength1)),
                                  at: pointer)
                     diffs[pointer - 1] =
-                        .delete(deletion.substring(to: deletionLength - overlapLength1))
-                    diffs[pointer + 1] = .insert(insertion.substring(from: overlapLength1))
+                        .delete(text: deletion.substring(to: deletionLength - overlapLength1))
+                    diffs[pointer + 1] = .insert(text: insertion.substring(from: overlapLength1))
                     pointer += 1
                 }
             } else {
@@ -400,12 +400,12 @@ public func cleanupSemantic(diffs: [Diff]) -> [Diff] {
                 {
                     // Reverse overlap found.
                     // Insert an equality and swap and trim the surrounding edits.
-                    diffs.insert(.equal(deletion.substring(to: overlapLength2)),
+                    diffs.insert(.equal(text: deletion.substring(to: overlapLength2)),
                                  at: pointer)
                     diffs[pointer - 1] =
-                        .insert(insertion.substring(to: insertionLength - overlapLength2))
+                        .insert(text: insertion.substring(to: insertionLength - overlapLength2))
                     diffs[pointer + 1] =
-                        .delete(deletion.substring(from: overlapLength2))
+                        .delete(text: deletion.substring(from: overlapLength2))
                     pointer += 1
                 }
             }

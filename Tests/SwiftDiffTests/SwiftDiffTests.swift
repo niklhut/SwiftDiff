@@ -59,65 +59,65 @@ class SwiftDiffTests: XCTestCase {
                        diff(text1: "", text2: ""))
 
         // Equality.
-        XCTAssertEqual([.equal("abc")],
+        XCTAssertEqual([.equal(text: "abc")],
                        diff(text1: "abc", text2: "abc"))
 
         // Simple insertion.
-        XCTAssertEqual([.equal("ab"), .insert("123"), .equal("c")],
+        XCTAssertEqual([.equal(text: "ab"), .insert(text: "123"), .equal(text: "c")],
                        diff(text1: "abc",
                             text2: "ab123c"))
 
         // Simple deletion.
-        XCTAssertEqual([.equal("a"), .delete("123"), .equal("bc")],
+        XCTAssertEqual([.equal(text: "a"), .delete(text: "123"), .equal(text: "bc")],
                        diff(text1: "a123bc",
                             text2: "abc"))
 
         // Two insertions.
-        XCTAssertEqual([.equal("a"), .insert("123"),
-                        .equal("b"), .insert("456"),
-                        .equal("c")],
+        XCTAssertEqual([.equal(text: "a"), .insert(text: "123"),
+                        .equal(text: "b"), .insert(text: "456"),
+                        .equal(text: "c")],
                        diff(text1: "abc",
                             text2: "a123b456c"))
 
         // Two deletions.
-        XCTAssertEqual([.equal("a"), .delete("123"),
-                        .equal("b"), .delete("456"),
-                        .equal("c")],
+        XCTAssertEqual([.equal(text: "a"), .delete(text: "123"),
+                        .equal(text: "b"), .delete(text: "456"),
+                        .equal(text: "c")],
                        diff(text1: "a123b456c",
                             text2: "abc"))
 
         // Simple cases.
-        XCTAssertEqual([.delete("a"), .insert("b")],
+        XCTAssertEqual([.delete(text: "a"), .insert(text: "b")],
                        diff(text1: "a",
                             text2: "b"))
 
-        XCTAssertEqual([.delete("a"), .insert("\u{0680}"), .equal("x"), .delete("\t"), .insert("\0")],
+        XCTAssertEqual([.delete(text: "a"), .insert(text: "\u{0680}"), .equal(text: "x"), .delete(text: "\t"), .insert(text: "\0")],
                        diff(text1: "ax\t",
                             text2: "\u{0680}x\0"))
 
         // Requires first phase of cleanupMerge.
-        XCTAssertEqual([.delete("Apple"), .insert("Banana"), .equal("s are a"),
-                        .insert("lso"), .equal(" fruit.")],
+        XCTAssertEqual([.delete(text: "Apple"), .insert(text: "Banana"), .equal(text: "s are a"),
+                        .insert(text: "lso"), .equal(text: " fruit.")],
                        diff(text1: "Apples are a fruit.",
                             text2: "Bananas are also fruit."))
 
         // Overlaps.
-        XCTAssertEqual([.delete("1"), .equal("a"), .delete("y"), .equal("b"), .delete("2"), .insert("xab")],
+        XCTAssertEqual([.delete(text: "1"), .equal(text: "a"), .delete(text: "y"), .equal(text: "b"), .delete(text: "2"), .insert(text: "xab")],
                        diff(text1: "1ayb2",
                             text2: "abxab"))
 
         // Requires second phase of cleanupMerge.
-        XCTAssertEqual([.insert("xaxcx"), .equal("abc"), .delete("y")],
+        XCTAssertEqual([.insert(text: "xaxcx"), .equal(text: "abc"), .delete(text: "y")],
                        diff(text1: "abcy", text2: "xaxcxabc"))
 
-        XCTAssertEqual([.delete("ABCD"), .equal("a"), .delete("="), .insert("-"), .equal("bcd"),
-                        .delete("="), .insert("-"), .equal("efghijklmnopqrs"), .delete("EFGHIJKLMNOefg")],
+        XCTAssertEqual([.delete(text: "ABCD"), .equal(text: "a"), .delete(text: "="), .insert(text: "-"), .equal(text: "bcd"),
+                        .delete(text: "="), .insert(text: "-"), .equal(text: "efghijklmnopqrs"), .delete(text: "EFGHIJKLMNOefg")],
                        diff(text1: "ABCDa=bcd=efghijklmnopqrsEFGHIJKLMNOefg",
                             text2: "a-bcd-efghijklmnopqrs"))
 
         // Large equality.
-        XCTAssertEqual([.insert(" "), .equal("a"), .insert("nd"),
-                        .equal(" [[Pennsylvania]]"), .delete(" and [[New")],
+        XCTAssertEqual([.insert(text: " "), .equal(text: "a"), .insert(text: "nd"),
+                        .equal(text: " [[Pennsylvania]]"), .delete(text: " and [[New")],
                        diff(text1: "a [[Pennsylvania]] and [[New",
                             text2: " and [[Pennsylvania]]"))
 
@@ -227,61 +227,61 @@ class SwiftDiffTests: XCTestCase {
                        cleanupMerge(diffs: []))
 
         // No change case.
-        XCTAssertEqual([.equal("a"), .delete("b"), .insert("c")],
+        XCTAssertEqual([.equal(text: "a"), .delete(text: "b"), .insert(text: "c")],
                        cleanupMerge(diffs:
-                        [.equal("a"), .delete("b"), .insert("c")]))
+                                        [.equal(text: "a"), .delete(text: "b"), .insert(text: "c")]))
 
         // Merge equalities.
-        XCTAssertEqual([.equal("abc")],
+        XCTAssertEqual([.equal(text: "abc")],
                        cleanupMerge(diffs:
-                        [.equal("a"), .equal("b"), .equal("c")]))
+                                        [.equal(text: "a"), .equal(text: "b"), .equal(text: "c")]))
 
         // Merge deletions.
-        XCTAssertEqual([.delete("abc")],
+        XCTAssertEqual([.delete(text: "abc")],
                        cleanupMerge(diffs:
-                        [.delete("a"), .delete("b"), .delete("c")]))
+                                        [.delete(text: "a"), .delete(text: "b"), .delete(text: "c")]))
 
         // Merge insertions.
-        XCTAssertEqual([.insert("abc")],
+        XCTAssertEqual([.insert(text: "abc")],
                        cleanupMerge(diffs:
-                        [.insert("a"), .insert("b"), .insert("c")]))
+                                        [.insert(text: "a"), .insert(text: "b"), .insert(text: "c")]))
 
         // Merge interweave.
-        XCTAssertEqual([.delete("ac"), .insert("bd"), .equal("ef")],
+        XCTAssertEqual([.delete(text: "ac"), .insert(text: "bd"), .equal(text: "ef")],
                        cleanupMerge(diffs:
-                        [.delete("a"), .insert("b"), .delete("c"), .insert("d"), .equal("e"), .equal("f")]))
+                                        [.delete(text: "a"), .insert(text: "b"), .delete(text: "c"), .insert(text: "d"), .equal(text: "e"), .equal(text: "f")]))
 
         // Prefix and suffix detection.
-        XCTAssertEqual([.equal("a"), .delete("d"), .insert("b"), .equal("c")],
+        XCTAssertEqual([.equal(text: "a"), .delete(text: "d"), .insert(text: "b"), .equal(text: "c")],
                        cleanupMerge(diffs:
-                        [.delete("a"), .insert("abc"), .delete("dc")]))
+                                        [.delete(text: "a"), .insert(text: "abc"), .delete(text: "dc")]))
 
         // Prefix and suffix detection with equalities.
-        XCTAssertEqual([.equal("xa"), .delete("d"), .insert("b"), .equal("cy")],
+        XCTAssertEqual([.equal(text: "xa"), .delete(text: "d"), .insert(text: "b"), .equal(text: "cy")],
                        cleanupMerge(diffs:
-                        [.equal("x"), .delete("a"), .insert("abc"), .delete("dc"), .equal("y")]))
+                                        [.equal(text: "x"), .delete(text: "a"), .insert(text: "abc"), .delete(text: "dc"), .equal(text: "y")]))
 
         // Second phase:
 
         // Slide edit left.
-        XCTAssertEqual([.insert("ab"), .equal("ac")],
+        XCTAssertEqual([.insert(text: "ab"), .equal(text: "ac")],
                        cleanupMerge(diffs:
-                        [.equal("a"), .insert("ba"), .equal("c")]))
+                                        [.equal(text: "a"), .insert(text: "ba"), .equal(text: "c")]))
 
         // Slide edit right.
-        XCTAssertEqual([.equal("ca"), .insert("ba")],
+        XCTAssertEqual([.equal(text: "ca"), .insert(text: "ba")],
                        cleanupMerge(diffs:
-                        [.equal("c"), .insert("ab"), .equal("a")]))
+                                        [.equal(text: "c"), .insert(text: "ab"), .equal(text: "a")]))
 
         // Slide edit left recursive.
-        XCTAssertEqual([.delete("abc"), .equal("acx")],
+        XCTAssertEqual([.delete(text: "abc"), .equal(text: "acx")],
                        cleanupMerge(diffs:
-                        [.equal("a"), .delete("b"), .equal("c"), .delete("ac"), .equal("x")]))
+                                        [.equal(text: "a"), .delete(text: "b"), .equal(text: "c"), .delete(text: "ac"), .equal(text: "x")]))
 
         // Slide edit right recursive.
-        XCTAssertEqual([.equal("xca"), .delete("cba")],
+        XCTAssertEqual([.equal(text: "xca"), .delete(text: "cba")],
                        cleanupMerge(diffs:
-                        [.equal("x"), .delete("ca"), .equal("c"), .delete("b"), .equal("a")]))
+                                        [.equal(text: "x"), .delete(text: "ca"), .equal(text: "c"), .delete(text: "b"), .equal(text: "a")]))
     }
 
     func testCleanupSemanticScore() {
@@ -301,40 +301,40 @@ class SwiftDiffTests: XCTestCase {
                        cleanupSemanticLossless(diffs: []))
 
         // Blank lines.
-        XCTAssertEqual([.equal("AAA\r\n\r\n"), .insert("BBB\r\nDDD\r\n\r\n"), .equal("BBB\r\nEEE")],
+        XCTAssertEqual([.equal(text: "AAA\r\n\r\n"), .insert(text: "BBB\r\nDDD\r\n\r\n"), .equal(text: "BBB\r\nEEE")],
                        cleanupSemanticLossless(diffs:
-                        [.equal("AAA\r\n\r\nBBB"), .insert("\r\nDDD\r\n\r\nBBB"), .equal("\r\nEEE")]))
+                                                [.equal(text: "AAA\r\n\r\nBBB"), .insert(text: "\r\nDDD\r\n\r\nBBB"), .equal(text: "\r\nEEE")]))
 
         // Line boundaries.
-        XCTAssertEqual([.equal("AAA\r\n"), .insert("BBB DDD\r\n"), .equal("BBB EEE")],
+        XCTAssertEqual([.equal(text: "AAA\r\n"), .insert(text: "BBB DDD\r\n"), .equal(text: "BBB EEE")],
                        cleanupSemanticLossless(diffs:
-                        [.equal("AAA\r\nBBB"), .insert(" DDD\r\nBBB"), .equal(" EEE")]))
+                                                [.equal(text: "AAA\r\nBBB"), .insert(text: " DDD\r\nBBB"), .equal(text: " EEE")]))
 
         // Word boundaries.
-        XCTAssertEqual([.equal("The "), .insert("cow and the "), .equal("cat.")],
+        XCTAssertEqual([.equal(text: "The "), .insert(text: "cow and the "), .equal(text: "cat.")],
                        cleanupSemanticLossless(diffs:
-                        [.equal("The c"), .insert("ow and the c"), .equal("at.")]))
+                                                [.equal(text: "The c"), .insert(text: "ow and the c"), .equal(text: "at.")]))
 
         // Alphanumeric boundaries.
 
-        XCTAssertEqual([.equal("The-"), .insert("cow-and-the-"), .equal("cat.")],
+        XCTAssertEqual([.equal(text: "The-"), .insert(text: "cow-and-the-"), .equal(text: "cat.")],
                        cleanupSemanticLossless(diffs:
-                        [.equal("The-c"), .insert("ow-and-the-c"), .equal("at.")]))
+                                                [.equal(text: "The-c"), .insert(text: "ow-and-the-c"), .equal(text: "at.")]))
 
         // Hitting the start.
-        XCTAssertEqual([.delete("a"), .equal("aax")],
+        XCTAssertEqual([.delete(text: "a"), .equal(text: "aax")],
                        cleanupSemanticLossless(diffs:
-                        [.equal("a"), .delete("a"), .equal("ax")]))
+                                                [.equal(text: "a"), .delete(text: "a"), .equal(text: "ax")]))
 
         // Hitting the end.
-        XCTAssertEqual([.equal("xaa"), .delete("a")],
+        XCTAssertEqual([.equal(text: "xaa"), .delete(text: "a")],
                        cleanupSemanticLossless(diffs:
-                        [.equal("xa"), .delete("a"), .equal("a")]))
+                                                [.equal(text: "xa"), .delete(text: "a"), .equal(text: "a")]))
 
         // Sentence boundaries.
-        XCTAssertEqual([.equal("The xxx."), .insert(" The zzz."), .equal(" The yyy.")],
+        XCTAssertEqual([.equal(text: "The xxx."), .insert(text: " The zzz."), .equal(text: " The yyy.")],
                        cleanupSemanticLossless(diffs:
-                        [.equal("The xxx. The "), .insert("zzz. The "), .equal("yyy.")]))
+                                                [.equal(text: "The xxx. The "), .insert(text: "zzz. The "), .equal(text: "yyy.")]))
     }
 
     func testDiffCleanupSemantic() {
@@ -345,57 +345,57 @@ class SwiftDiffTests: XCTestCase {
                        cleanupSemantic(diffs: []))
 
         // No elimination #1.
-        XCTAssertEqual([.delete("ab"), .insert("cd"), .equal("12"), .delete("e")],
+        XCTAssertEqual([.delete(text: "ab"), .insert(text: "cd"), .equal(text: "12"), .delete(text: "e")],
                        cleanupSemantic(diffs:
-                        [.delete("ab"), .insert("cd"), .equal("12"), .delete("e")]))
+                                        [.delete(text: "ab"), .insert(text: "cd"), .equal(text: "12"), .delete(text: "e")]))
 
         // No elimination #2.
 
-        XCTAssertEqual([.delete("abc"), .insert("ABC"), .equal("1234"), .delete("wxyz")],
+        XCTAssertEqual([.delete(text: "abc"), .insert(text: "ABC"), .equal(text: "1234"), .delete(text: "wxyz")],
                        cleanupSemantic(diffs:
-                        [.delete("abc"), .insert("ABC"), .equal("1234"), .delete("wxyz")]))
+                                        [.delete(text: "abc"), .insert(text: "ABC"), .equal(text: "1234"), .delete(text: "wxyz")]))
 
         // Simple elimination.
-        XCTAssertEqual([.delete("abc"), .insert("b")],
-                       cleanupSemantic(diffs: [.delete("a"), .equal("b"), .delete("c")]))
+        XCTAssertEqual([.delete(text: "abc"), .insert(text: "b")],
+                       cleanupSemantic(diffs: [.delete(text: "a"), .equal(text: "b"), .delete(text: "c")]))
 
         // Backpass elimination.
-        XCTAssertEqual([.delete("abcdef"), .insert("cdfg")],
+        XCTAssertEqual([.delete(text: "abcdef"), .insert(text: "cdfg")],
                        cleanupSemantic(diffs:
-                        [.delete("ab"), .equal("cd"), .delete("e"), .equal("f"), .insert("g")]))
+                                        [.delete(text: "ab"), .equal(text: "cd"), .delete(text: "e"), .equal(text: "f"), .insert(text: "g")]))
 
         // Multiple eliminations.
-        XCTAssertEqual([.delete("AB_AB"), .insert("1A2_1A2")],
+        XCTAssertEqual([.delete(text: "AB_AB"), .insert(text: "1A2_1A2")],
                        cleanupSemantic(diffs:
-                        [.insert("1"), .equal("A"), .delete("B"), .insert("2"), .equal("_"),
-                         .insert("1"), .equal("A"), .delete("B"), .insert("2")]))
+                                        [.insert(text: "1"), .equal(text: "A"), .delete(text: "B"), .insert(text: "2"), .equal(text: "_"),
+                                         .insert(text: "1"), .equal(text: "A"), .delete(text: "B"), .insert(text: "2")]))
 
         // Word boundaries.
-        XCTAssertEqual([.equal("The "), .delete("cow and the "), .equal("cat.")],
+        XCTAssertEqual([.equal(text: "The "), .delete(text: "cow and the "), .equal(text: "cat.")],
                        cleanupSemantic(diffs:
-                        [.equal("The c"), .delete("ow and the c"), .equal("at.")]))
+                                        [.equal(text: "The c"), .delete(text: "ow and the c"), .equal(text: "at.")]))
 
         // No overlap elimination.
-        XCTAssertEqual([.delete("abcxx"), .insert("xxdef")],
+        XCTAssertEqual([.delete(text: "abcxx"), .insert(text: "xxdef")],
                        cleanupSemantic(diffs:
-                        [.delete("abcxx"), .insert("xxdef")]))
+                                        [.delete(text: "abcxx"), .insert(text: "xxdef")]))
 
         // Overlap elimination.
-        XCTAssertEqual([.delete("abc"), .equal("xxx"), .insert("def")],
+        XCTAssertEqual([.delete(text: "abc"), .equal(text: "xxx"), .insert(text: "def")],
                        cleanupSemantic(diffs:
-                        [.delete("abcxxx"), .insert("xxxdef")]))
+                                        [.delete(text: "abcxxx"), .insert(text: "xxxdef")]))
 
         // Reverse overlap elimination.
-        XCTAssertEqual([.insert("def"), .equal("xxx"), .delete("abc")],
+        XCTAssertEqual([.insert(text: "def"), .equal(text: "xxx"), .delete(text: "abc")],
                        cleanupSemantic(diffs:
-                        [.delete("xxxabc"), .insert("defxxx")]))
+                                        [.delete(text: "xxxabc"), .insert(text: "defxxx")]))
 
         // Two overlap eliminations.
-        XCTAssertEqual([.delete("abcd"), .equal("1212"), .insert("efghi"), .equal("----"),
-                        .delete("A"), .equal("3"), .insert("BC")],
+        XCTAssertEqual([.delete(text: "abcd"), .equal(text: "1212"), .insert(text: "efghi"), .equal(text: "----"),
+                        .delete(text: "A"), .equal(text: "3"), .insert(text: "BC")],
                        cleanupSemantic(diffs:
-                        [.delete("abcd1212"), .insert("1212efghi"), .equal("----"),
-                         .delete("A3"), .insert("3BC")]))
+                                        [.delete(text: "abcd1212"), .insert(text: "1212efghi"), .equal(text: "----"),
+                         .delete(text: "A3"), .insert(text: "3BC")]))
     }
 }
 

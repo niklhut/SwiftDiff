@@ -2,9 +2,9 @@ import CoreFoundation
 
 
 public enum Diff: Equatable, Codable {
-    case equal(_ text: String)
-    case insert(_ text: String)
-    case delete(_ text: String)
+    case equal(text: String)
+    case insert(text: String)
+    case delete(text: String)
 
     public var text: String {
         switch self {
@@ -20,11 +20,11 @@ public enum Diff: Equatable, Codable {
     public func with(text: String) -> Diff {
         switch self {
         case .equal:
-            return .equal(text)
+            return .equal(text: text)
         case .insert:
-            return .insert(text)
+            return .insert(text: text)
         case .delete:
-            return .delete(text)
+            return .delete(text: text)
         }
     }
 
@@ -49,7 +49,7 @@ func diffEqual(text1: String, text2: String) -> [Diff]? {
         if text1.isEmpty {
             return []
         }
-        return [.equal(text1)]
+        return [.equal(text: text1)]
     }
     
     return nil
@@ -100,12 +100,12 @@ func diff(text1: String, text2: String,
 
     // Restore the prefix.
     if !commonPrefix.isEmpty {
-        diffs.insert(.equal(commonPrefix), at: 0)
+        diffs.insert(.equal(text: commonPrefix), at: 0)
     }
 
     // Restore and suffix.
     if !commonSuffix.isEmpty {
-        diffs.append(.equal(commonSuffix))
+        diffs.append(.equal(text: commonSuffix))
     }
 
     return cleanupMerge(diffs: diffs)
@@ -119,12 +119,12 @@ func diffMiddle(text1: String, length1: Int,
 
     // Just added some text? (speedup).
     if text1.isEmpty {
-        return [.insert(text2)]
+        return [.insert(text: text2)]
     }
 
     // Just deleted some text? (speedup).
     if text2.isEmpty {
-        return [.delete(text1)]
+        return [.delete(text: text1)]
     }
 
     let (longText, shortText, shortTextLength) =
@@ -140,17 +140,17 @@ func diffMiddle(text1: String, length1: Int,
                                          offsetBy: shortTextLength)
         let suffix = String(longText[suffixStart...])
         if length1 <= length2 {
-            return [.insert(prefix), .equal(shortText), .insert(suffix)]
+            return [.insert(text: prefix), .equal(text: shortText), .insert(text: suffix)]
         } else {
             // Swap insertions for deletions if diff is reversed.
-            return [.delete(prefix), .equal(shortText), .delete(suffix)]
+            return [.delete(text: prefix), .equal(text: shortText), .delete(text: suffix)]
         }
     }
 
     if shortTextLength == 1 {
         // Single character string.
         // After the previous speedup, the character can't be an equality.
-        return [.delete(text1), .insert(text2)]
+        return [.delete(text: text1), .insert(text: text2)]
     }
 
     // Don't risk returning a non-optimal diff if we have unlimited time.
@@ -164,7 +164,7 @@ func diffMiddle(text1: String, length1: Int,
         let diffsB = diff(text1: halfMatch.text1B, text2: halfMatch.text2B,
                           performHalfMatch: performHalfMatch,
                           deadline: deadline)
-        let equal = [Diff.equal(halfMatch.midCommon)]
+        let equal = [Diff.equal(text: halfMatch.midCommon)]
         return diffsA + equal + diffsB
     }
 
@@ -435,7 +435,7 @@ func bisect(text1: String, length1: Int,
 
     // Diff took too long and hit the deadline or
     // number of diffs equals number of characters, no commonality at all.
-    return [.delete(text1), .insert(text2)]
+    return [.delete(text: text1), .insert(text: text2)]
 }
 
 
