@@ -1,7 +1,7 @@
 import CoreFoundation
 
 
-public enum Diff: Equatable {
+public enum Diff: Equatable, Codable {
     case equal(String)
     case insert(String)
     case delete(String)
