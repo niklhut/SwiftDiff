@@ -2,9 +2,9 @@ import CoreFoundation
 
 
 public enum Diff: Equatable, Codable {
-    case equal(String)
-    case insert(String)
-    case delete(String)
+    case equal(_ text: String)
+    case insert(_ text: String)
+    case delete(_ text: String)
 
     public var text: String {
         switch self {
