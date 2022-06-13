@@ -4,7 +4,9 @@ SwiftDiff is a (partial) port of the [Google Diff, Match and Patch Library (goog
 
 So far only the diff algorithm has been ported. It allows comparing two blocks of plain text and efficiently returning a list of their differences. It supports detecting in-line text differences.
 
-SwiftDiff was updated to Swift 5 and SPM 5.1 by Cyberfun
+SwiftDiff was updated to Swift 5 and SPM 5.1 by Cyberfun.
+
+SwiftDiff was updated to Swift and SPM 5.7 by niklhut.
 
 ## License
 
